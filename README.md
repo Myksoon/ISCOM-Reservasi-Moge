@@ -58,8 +58,9 @@ di `.env`, lalu jalankan seeder lagi.
 Daftar motor dan harganya ada di `config/moge.php`. Kalau mau menambah motor,
 cukup tambah satu data di file itu dan taruh fotonya di `public/images`.
 
-Website ini juga punya tema terang dan gelap. Tombolnya ada di pojok kanan
-navbar, dan pilihan tema disimpan di browser.
+Tombol **Akun** di pojok kanan atas membuka panel akun. Pengunjung bisa langsung
+menuju halaman login, sedangkan admin yang sudah login melihat jumlah booking yang
+menunggu konfirmasi beserta link ke daftar booking.
 
 ## Menjalankan di Laragon
 
@@ -118,6 +119,3 @@ Foto motor diambil dari Wikimedia Commons:
 - Ducati Panigale V2 oleh Terragio67 (CC BY-SA 4.0)
 - Yamaha YZF-R1M oleh Dennis Bratland (CC BY-SA 4.0)
 - Honda CBR1000RR-R oleh Chanokchon (CC BY-SA 4.0)
-
-Efek tinta saat ganti tema terinspirasi dari
-[Ink Bleed](https://github.com/codemure-official/ink-bleed-theme-changer) buatan Codemure.

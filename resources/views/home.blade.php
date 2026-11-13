@@ -24,7 +24,7 @@
     <div class="sempit">
         <div class="row g-4">
             @foreach($armada->groupBy('tipe') as $tipe => $motor)
-                <div class="col-md-4">
+                <div class="col-md-4" data-muncul style="--tunda: {{ $loop->index * 0.1 }}s">
                     <a href="#armada" class="kartu-foto">
                         <img src="{{ asset('images/' . ($foto[$tipe] ?? $motor->first()['gambar'])) }}" alt="" loading="lazy" width="900" height="600">
                         <div class="kartu-bawah">
@@ -43,12 +43,12 @@
 
 <section class="bagian bagian-gelap" id="armada">
     <div class="lebar">
-        <h2 class="mb-2">Armada</h2>
-        <p class="redup mb-5">Harga sewa per hari. Pilih motornya, lalu isi jadwal di form booking.</p>
+        <h2 class="mb-2" data-muncul>Armada</h2>
+        <p class="redup mb-5" data-muncul style="--tunda: 0.1s">Harga sewa per hari. Pilih motornya, lalu isi jadwal di form booking.</p>
 
         <div class="row g-4">
             @foreach($armada as $motor)
-                <div class="{{ $loop->first ? 'col-12' : 'col-md-6' }}">
+                <div class="{{ $loop->first ? 'col-12' : 'col-md-6' }}" data-muncul style="--tunda: {{ $loop->first ? 0 : ($loop->index - 1) % 2 * 0.12 }}s">
                     <a href="{{ route('bookings.create', ['moge' => $motor['nama']]) }}" class="kartu-foto kartu-motor">
                         <img src="{{ asset('images/' . $motor['gambar']) }}" alt="{{ $motor['nama'] }}" loading="lazy" width="900" height="600">
                         <div class="pil-baris">
@@ -71,28 +71,28 @@
 
 <section class="bagian">
     <div class="bagian-belah">
-        <div>
+        <div data-muncul>
             <h2>Cari jadwal yang masih kosong.</h2>
             <p>Isi jadwal ambil dan jadwal kembali. Kalau motornya sudah dipesan orang lain di jam itu, form langsung memberi tahu sampai kapan motor itu dipakai.</p>
             <a href="{{ route('bookings.create') }}" class="btn btn-utama">Booking sekarang</a>
         </div>
-        <img src="{{ asset('images/cbr1000rr.jpg') }}" alt="Honda CBR1000RR-R merah putih biru" loading="lazy" width="900" height="675">
+        <img src="{{ asset('images/cbr1000rr.jpg') }}" alt="Honda CBR1000RR-R merah putih biru" loading="lazy" width="900" height="675" data-muncul style="--tunda: 0.15s">
     </div>
 </section>
 
 <section class="bagian pt-0">
     <div class="sempit">
-        <h2 class="text-center mb-5">Cara sewa</h2>
+        <h2 class="text-center mb-5" data-muncul>Cara sewa</h2>
         <ol class="langkah">
-            <li>
+            <li data-muncul style="--tunda: 0.00s">
                 <h3>Pilih motor dan tanggal</h3>
                 <p>Isi form booking dengan jadwal ambil dan jadwal kembali.</p>
             </li>
-            <li>
+            <li data-muncul style="--tunda: 0.12s">
                 <h3>Tunggu konfirmasi</h3>
                 <p>Admin menghubungi nomor WhatsApp yang kamu isi untuk memastikan jadwal dan pembayaran.</p>
             </li>
-            <li>
+            <li data-muncul style="--tunda: 0.24s">
                 <h3>Ambil motornya</h3>
                 <p>Datang sesuai jadwal dengan membawa KTP dan SIM yang masih berlaku.</p>
             </li>
