@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Vercel ada di belakang proxy, tanpa ini link asset jadi http
         $middleware->trustProxies(at: '*');
+        $middleware->redirectUsersTo('/bookings');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

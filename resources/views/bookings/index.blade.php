@@ -3,13 +3,13 @@
 @section('title', 'Daftar booking - Sewa Moge Surabaya')
 
 @section('content')
-<main class="container py-4 py-lg-5">
+<main class="container halaman">
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
         <div>
             <h2 class="mb-1">Daftar booking</h2>
             <p class="text-secondary mb-0">Status berubah sendiri saat jadwal sewa mulai dan selesai.</p>
         </div>
-        <a href="{{ route('bookings.create') }}" class="btn btn-petrol">Tambah booking</a>
+        <a href="{{ route('bookings.create') }}" class="btn btn-utama">Tambah booking</a>
     </div>
 
     @if(session('success'))
@@ -31,7 +31,7 @@
             @endforeach
         </nav>
 
-        <form action="{{ route('bookings.index') }}" method="GET" class="d-flex gap-2" role="search">
+        <form action="{{ route('bookings.index') }}" method="GET" class="d-flex gap-2 form-cari" role="search">
             @if(request('status'))
                 <input type="hidden" name="status" value="{{ request('status') }}">
             @endif
@@ -40,7 +40,7 @@
         </form>
     </div>
 
-    <div class="panel">
+    <div class="panel panel-tabel">
         <div class="table-responsive">
             <table class="table tabel-booking">
                 <thead>

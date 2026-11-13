@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Booking;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -10,6 +11,11 @@ use Tests\TestCase;
 class BookingTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function loginAdmin(): void
+    {
+        $this->actingAs(User::factory()->create());
+    }
 
     public function test_homepage_shows_fleet(): void
     {
@@ -21,6 +27,8 @@ class BookingTest extends TestCase
 
     public function test_index_displays_bookings(): void
     {
+        $this->loginAdmin();
+
         Booking::create([
             'nama' => 'Budi Santoso',
             'no_hp' => '081234567890',
@@ -61,7 +69,7 @@ class BookingTest extends TestCase
 
         $response = $this->post(route('bookings.store'), $data);
 
-        $response->assertRedirect(route('bookings.index'));
+        $response->assertRedirect(route('bookings.create'));
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('bookings', [
@@ -86,7 +94,7 @@ class BookingTest extends TestCase
 
         $response = $this->post(route('bookings.store'), $data);
 
-        $response->assertRedirect(route('bookings.index'));
+        $response->assertRedirect(route('bookings.create'));
         $this->assertDatabaseHas('bookings', [
             'nama' => 'Satriya Racing',
             'status' => 'disewa',
@@ -108,7 +116,7 @@ class BookingTest extends TestCase
 
         $response = $this->post(route('bookings.store'), $data);
 
-        $response->assertRedirect(route('bookings.index'));
+        $response->assertRedirect(route('bookings.create'));
         $this->assertDatabaseHas('bookings', [
             'nama' => 'Gerry Salim',
             'status' => 'selesai',
@@ -117,6 +125,8 @@ class BookingTest extends TestCase
 
     public function test_index_automatically_updates_status_to_disewa_and_selesai(): void
     {
+        $this->loginAdmin();
+
         $activeBooking = Booking::create([
             'nama' => 'Dimas Active',
             'no_hp' => '08129876543',
@@ -155,6 +165,8 @@ class BookingTest extends TestCase
 
     public function test_edit_page_loads_with_booking_data(): void
     {
+        $this->loginAdmin();
+
         $booking = Booking::create([
             'nama' => 'Citra Kirana',
             'no_hp' => '08551234567',
@@ -174,6 +186,8 @@ class BookingTest extends TestCase
 
     public function test_update_modifies_booking_and_status(): void
     {
+        $this->loginAdmin();
+
         $booking = Booking::create([
             'nama' => 'Citra Kirana',
             'no_hp' => '08551234567',
@@ -211,6 +225,8 @@ class BookingTest extends TestCase
 
     public function test_destroy_deletes_booking(): void
     {
+        $this->loginAdmin();
+
         $booking = Booking::create([
             'nama' => 'Eko Prasetyo',
             'no_hp' => '08123444555',
@@ -234,6 +250,8 @@ class BookingTest extends TestCase
 
     public function test_update_status_to_delay_and_reschedule(): void
     {
+        $this->loginAdmin();
+
         $booking = Booking::create([
             'nama' => 'Rider Delay',
             'no_hp' => '08123444555',
@@ -324,6 +342,8 @@ class BookingTest extends TestCase
 
     public function test_index_can_search_and_filter_by_status(): void
     {
+        $this->loginAdmin();
+
         $dasar = [
             'no_hp' => '081200000003',
             'tanggal' => Carbon::now()->addDays(2)->toDateString(),
@@ -341,5 +361,84 @@ class BookingTest extends TestCase
         $this->get(route('bookings.index', ['status' => 'batal']))
             ->assertSee('Joko Susilo')
             ->assertDontSee('Rina Wijaya');
+    }
+
+    public function test_guest_cannot_open_admin_pages(): void
+    {
+        $booking = Booking::create([
+            'nama' => 'Rahasia',
+            'no_hp' => '081200000009',
+            'moge' => 'Ducati Panigale V2',
+            'tanggal' => Carbon::now()->addDays(2)->toDateString(),
+            'jam' => '10:00:00',
+            'tanggal_selesai' => Carbon::now()->addDays(2)->toDateString(),
+            'jam_selesai' => '18:00:00',
+            'status' => 'menunggu',
+        ]);
+
+        $this->get(route('bookings.index'))->assertRedirect(route('login'));
+        $this->get(route('bookings.edit', $booking))->assertRedirect(route('login'));
+        $this->put(route('bookings.update', $booking), [])->assertRedirect(route('login'));
+        $this->delete(route('bookings.destroy', $booking))->assertRedirect(route('login'));
+
+        $this->assertDatabaseHas('bookings', ['id' => $booking->id]);
+    }
+
+    public function test_guest_booking_shows_confirmation_on_form(): void
+    {
+        $this->post(route('bookings.store'), [
+            'nama' => 'Pengunjung',
+            'no_hp' => '081200000010',
+            'moge' => 'Kawasaki Ninja ZX-6R',
+            'tanggal' => Carbon::now()->addDays(4)->toDateString(),
+            'jam' => '08:00',
+            'tanggal_selesai' => Carbon::now()->addDays(4)->toDateString(),
+            'jam_selesai' => '16:00',
+        ])->assertRedirect(route('bookings.create'));
+
+        $this->get(route('bookings.create'))->assertSee('berhasil disimpan');
+    }
+
+    public function test_admin_can_login_and_logout(): void
+    {
+        $admin = User::factory()->create(['email' => 'agus', 'password' => '123']);
+
+        $this->post(route('login'), ['username' => 'agus', 'password' => 'salah'])
+            ->assertSessionHasErrors('username');
+        $this->assertGuest();
+
+        $this->post(route('login'), ['username' => 'agus', 'password' => '123'])
+            ->assertRedirect(route('bookings.index'));
+        $this->assertAuthenticatedAs($admin);
+
+        $this->post(route('logout'))->assertRedirect(route('home'));
+        $this->assertGuest();
+    }
+
+    public function test_error_messages_are_in_indonesian_and_hide_other_renter(): void
+    {
+        $data = [
+            'nama' => 'Penyewa Lama',
+            'no_hp' => '081200000011',
+            'moge' => 'Honda CBR1000RR-R',
+            'tanggal' => Carbon::now()->addDays(10)->toDateString(),
+            'jam' => '09:00',
+            'tanggal_selesai' => Carbon::now()->addDays(10)->toDateString(),
+            'jam_selesai' => '17:00',
+        ];
+        $this->post(route('bookings.store'), $data)->assertSessionHasNoErrors();
+
+        $this->post(route('bookings.store'), array_merge($data, ['nama' => 'Penyewa Baru']))
+            ->assertSessionHasErrors('moge');
+        $pesan = session('errors')->first('moge');
+        $this->assertStringContainsString('sudah dipesan sampai', $pesan);
+        $this->assertStringNotContainsString('Penyewa Lama', $pesan);
+
+        $this->post(route('bookings.store'), array_merge($data, [
+            'nama' => '',
+            'tanggal_selesai' => Carbon::now()->addDays(9)->toDateString(),
+        ]));
+        $this->assertSame('Nama pemesan wajib diisi.', session('errors')->first('nama'));
+        $this->assertSame('Tanggal kembali tidak boleh sebelum tanggal mulai.', session('errors')->first('tanggal_selesai'));
     }
 }

@@ -2,15 +2,64 @@
 
 Aplikasi Laravel untuk mencatat booking sewa motor gede. Dibuat untuk tugas ISCOM.
 
-## Fitur
+Website: https://iscom-reservasi-moge.vercel.app
 
-- Halaman beranda berisi daftar armada dan cara sewa
-- Tambah, ubah, hapus booking
-- Pilih motor dari daftar armada (`config/moge.php`)
-- Booking ditolak kalau motor yang sama sudah dipesan di jadwal yang bertabrakan
-- Status berubah otomatis: menunggu, disewa, selesai
-- Cari booking berdasarkan nama, nomor HP, atau motor, dan filter per status
-- Tema terang dan gelap, pindahnya dengan efek tinta menyebar (idenya dari [Ink Bleed](https://github.com/codemure-official/ink-bleed-theme-changer) buatan Codemure)
+## Tentang website
+
+Website ini dipakai untuk rental moge di Surabaya. Pengunjung bisa melihat motor
+yang tersedia beserta harga sewanya, lalu membuat booking tanpa perlu login. Admin
+login untuk melihat daftar booking, mengubah status, dan menghapus data.
+
+Ada tiga halaman utama:
+
+- **Beranda** (`/`): daftar motor, harga sewa per hari, dan cara sewa. Tombol
+  "Sewa motor ini" langsung membuka form booking dengan motor yang dipilih.
+- **Booking baru** (`/bookings/create`): form untuk mengisi nama, nomor WhatsApp,
+  motor, jadwal ambil, dan jadwal kembali.
+- **Daftar booking** (`/bookings`, khusus admin): semua booking, bisa dicari berdasarkan nama,
+  nomor HP, atau motor, dan bisa difilter per status. Nomor HP bisa diklik untuk
+  langsung chat WhatsApp.
+
+Setiap booking punya kode seperti plat nomor, misalnya `L 0012 MG`.
+
+## Login admin
+
+Halaman login ada di `/login`, linknya di bagian bawah website.
+
+Akun admin untuk testing:
+
+```
+Username: agus
+Password: 123
+```
+
+Akun ini hanya untuk testing. Sebelum website dipakai untuk booking sungguhan,
+ganti password-nya.
+
+Tidak ada halaman daftar akun, jadi akun admin dibuat lewat seeder:
+
+```
+php artisan db:seed
+```
+
+Untuk mengganti username atau password, isi `ADMIN_USERNAME` dan `ADMIN_PASSWORD`
+di `.env`, lalu jalankan seeder lagi.
+
+## Cara kerja booking
+
+- Satu motor tidak bisa dipesan dua orang di jam yang sama. Kalau jadwalnya
+  bertabrakan, form akan menolak dan memberi tahu motor itu dipesan sampai kapan.
+- Jam kembali harus setelah jam mulai sewa.
+- Status berubah sendiri sesuai waktu: **menunggu** sebelum jadwal mulai,
+  **disewa** saat jadwal berjalan, dan **selesai** setelah jam kembali lewat.
+- Status **delay**, **reschedule**, dan **batal** diubah manual oleh admin lewat
+  halaman edit. Booking yang batal atau selesai tidak menghalangi booking lain.
+
+Daftar motor dan harganya ada di `config/moge.php`. Kalau mau menambah motor,
+cukup tambah satu data di file itu dan taruh fotonya di `public/images`.
+
+Website ini juga punya tema terang dan gelap. Tombolnya ada di pojok kanan
+navbar, dan pilihan tema disimpan di browser.
 
 ## Menjalankan di Laragon
 
@@ -22,22 +71,45 @@ Aplikasi Laravel untuk mencatat booking sewa motor gede. Dibuat untuk tugas ISCO
 composer install
 copy .env.example .env
 php artisan key:generate
-php artisan migrate
+php artisan migrate --seed
 ```
 
 4. Buka `http://iscom-reservasi-moge.test` atau jalankan `php artisan serve`.
 
 Untuk menjalankan test: `php artisan test`
 
+Kalau tidak pakai MySQL (misalnya di Linux), bisa pakai SQLite. Ubah
+`DB_CONNECTION=sqlite` di `.env`, buat file kosong `database/database.sqlite`,
+lalu jalankan `php artisan migrate`.
+
 ## Deploy ke Vercel
 
-Sudah ada `vercel.json` dan `api/index.php`. Vercel tidak menyediakan MySQL, jadi
-perlu database online (misalnya Aiven atau TiDB Cloud). Isi di Environment Variables
-project Vercel: `APP_KEY`, `APP_URL`, `DB_CONNECTION` (isi `mysql`), `DB_HOST`, `DB_PORT`, `DB_DATABASE`,
-`DB_USERNAME`, `DB_PASSWORD`. Migrasi dijalankan dari laptop dengan `.env` yang
-mengarah ke database online tersebut.
+Konfigurasinya ada di `vercel.json` dan `api/index.php`. Di pengaturan project
+Vercel, pilih Framework Preset **Other** dan kosongkan Build Command.
 
-## Kredit foto
+Vercel tidak menyediakan database, jadi kami pakai TiDB Cloud (kompatibel dengan
+MySQL). Isi Environment Variables di Vercel:
+
+```
+APP_KEY=
+APP_URL=https://iscom-reservasi-moge.vercel.app
+DB_CONNECTION=mysql
+DB_HOST=
+DB_PORT=4000
+DB_DATABASE=sistem_booking
+DB_USERNAME=
+DB_PASSWORD=
+MYSQL_ATTR_SSL_CA=/etc/pki/tls/certs/ca-bundle.crt
+```
+
+`APP_KEY` dibuat dengan `php artisan key:generate --show`. Host, username, dan
+password diambil dari menu Connect di TiDB Cloud.
+
+Tabel dan akun admin dibuat sekali dari laptop dengan menjalankan
+`php artisan migrate --seed` memakai pengaturan database TiDB di atas. Setelah mengubah Environment Variables, lakukan
+Redeploy di Vercel.
+
+## Kredit
 
 Foto motor diambil dari Wikimedia Commons:
 
@@ -46,3 +118,6 @@ Foto motor diambil dari Wikimedia Commons:
 - Ducati Panigale V2 oleh Terragio67 (CC BY-SA 4.0)
 - Yamaha YZF-R1M oleh Dennis Bratland (CC BY-SA 4.0)
 - Honda CBR1000RR-R oleh Chanokchon (CC BY-SA 4.0)
+
+Efek tinta saat ganti tema terinspirasi dari
+[Ink Bleed](https://github.com/codemure-official/ink-bleed-theme-changer) buatan Codemure.
