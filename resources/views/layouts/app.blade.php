@@ -12,11 +12,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script>
-        // dipasang sebelum halaman digambar supaya tidak berkedip terang dulu
-        const temaAwal = localStorage.getItem('tema')
-            || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.dataset.theme = temaAwal;
-        document.documentElement.dataset.bsTheme = temaAwal;
+        // penanda bahwa JavaScript jalan, supaya animasi muncul tidak menyembunyikan isi kalau JS mati
+        document.documentElement.classList.add('js');
     </script>
 </head>
 <body>
@@ -28,8 +25,8 @@
                 </button>
             </div>
             <a class="merek" href="{{ route('home') }}">Moge Surabaya</a>
-            <button type="button" class="tombol-tema" id="tombol-tema" aria-label="Tema gelap" aria-pressed="false">
-                <i class="bi bi-moon" aria-hidden="true"></i>
+            <button type="button" class="tombol-akun" data-bs-toggle="offcanvas" data-bs-target="#akun" aria-controls="akun">
+                <i class="bi bi-person-circle" aria-hidden="true"></i><span>Akun</span>
             </button>
         </div>
     </header>
@@ -44,18 +41,36 @@
                 <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a></li>
                 <li><a href="{{ route('home') }}#armada">Armada</a></li>
                 <li><a href="{{ route('bookings.create') }}" class="{{ request()->routeIs('bookings.create') ? 'active' : '' }}">Booking baru</a></li>
-                @auth
+            </ul>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end menu-samping" id="akun" tabindex="-1" aria-labelledby="akun-judul">
+        <div class="offcanvas-header">
+            <h2 class="offcanvas-title" id="akun-judul">Akun</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup panel akun"></button>
+        </div>
+        <div class="offcanvas-body">
+            @auth
+                <p class="mb-3">Masuk sebagai <b>{{ auth()->user()->email }}</b></p>
+                <div class="akun-ringkas">
+                    <strong>{{ \App\Models\Booking::where('status', 'menunggu')->count() }}</strong>
+                    booking menunggu konfirmasi
+                </div>
+                <ul>
                     <li><a href="{{ route('bookings.index') }}" class="{{ request()->routeIs('bookings.index', 'bookings.edit') ? 'active' : '' }}">Daftar booking</a></li>
+                    <li><a href="{{ route('bookings.index', ['status' => 'menunggu']) }}">Perlu dikonfirmasi</a></li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="link-menu">Keluar</button>
                         </form>
                     </li>
-                @else
-                    <li><a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Login admin</a></li>
-                @endauth
-            </ul>
+                </ul>
+            @else
+                <p class="mb-4">Login untuk melihat dan mengelola booking. Pengunjung bisa membuat booking tanpa login.</p>
+                <a href="{{ route('login') }}" class="btn btn-utama w-100">Login admin</a>
+            @endauth
         </div>
     </div>
 
@@ -99,6 +114,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="{{ asset('js/tema.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
 </body>
 </html>
