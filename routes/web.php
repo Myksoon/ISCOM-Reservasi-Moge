@@ -3,7 +3,7 @@
 use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/bookings');
+Route::view('/', 'home')->name('home');
 
 Route::prefix('bookings')->name('bookings.')->group(function () {
     Route::get('/', [BookingController::class, 'index'])->name('index');

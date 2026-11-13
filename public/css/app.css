@@ -1,0 +1,383 @@
+:root {
+    --beton: #edeee9;
+    --aspal: #1a2327;
+    --petrol: #12414f;
+    --marka: #f5b81c;
+    --bata: #b23a2b;
+    --garis: #d3d6cf;
+    --garis-kuat: #aeb4ad;
+    --kertas: #fff;
+    --kertas-2: #f7f7f4;
+    --tinta: #1a2327;
+    --redup: #55605f;
+
+    --bs-body-bg: var(--beton);
+    --bs-body-color: var(--tinta);
+    --bs-body-font-family: "Barlow", system-ui, sans-serif;
+    --bs-link-color-rgb: 18, 65, 79;
+    --bs-link-hover-color-rgb: 26, 35, 39;
+    --bs-border-color: var(--garis);
+}
+
+[data-theme="dark"] {
+    --beton: #12181b;
+    --kertas: #1c262b;
+    --kertas-2: #222e34;
+    --tinta: #e9ebe6;
+    --redup: #9aa5a3;
+    --garis: #33404a;
+    --garis-kuat: #4b5a64;
+    --petrol: #1d6a80;
+    --bs-link-color-rgb: 126, 200, 220;
+    --bs-link-hover-color-rgb: 245, 184, 28;
+}
+
+h1, h2, h3, .judul {
+    font-family: "Barlow Condensed", "Barlow", sans-serif;
+    font-weight: 700;
+    line-height: 1.05;
+}
+
+h1 { font-size: clamp(2.6rem, 6vw, 4.5rem); }
+h2 { font-size: clamp(1.9rem, 3.5vw, 2.6rem); }
+h3 { font-size: 1.5rem; }
+
+a:focus-visible, .btn:focus-visible, .form-control:focus, .form-select:focus {
+    outline: 3px solid var(--marka);
+    outline-offset: 2px;
+    box-shadow: none;
+    border-color: var(--tinta);
+}
+
+/* navbar */
+.nav-utama {
+    background: var(--aspal);
+}
+.nav-utama .navbar-brand {
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #fff;
+}
+.nav-utama .nav-link {
+    color: #c9cfcc;
+    font-weight: 500;
+}
+.nav-utama .nav-link:hover, .nav-utama .nav-link.active {
+    color: var(--marka);
+}
+.tombol-tema {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    color: #c9cfcc;
+    background: none;
+    border: 1px solid #4b5a64;
+    border-radius: 4px;
+}
+.tombol-tema:hover {
+    color: var(--marka);
+    border-color: var(--marka);
+}
+
+/* tombol */
+.btn {
+    border-radius: 4px;
+    font-weight: 600;
+}
+.btn-marka {
+    --bs-btn-bg: var(--marka);
+    --bs-btn-border-color: var(--marka);
+    --bs-btn-color: var(--aspal);
+    --bs-btn-hover-bg: #ffc93a;
+    --bs-btn-hover-border-color: #ffc93a;
+    --bs-btn-hover-color: var(--aspal);
+    --bs-btn-active-bg: #e0a70f;
+    --bs-btn-active-border-color: #e0a70f;
+    --bs-btn-active-color: var(--aspal);
+}
+.btn-petrol {
+    --bs-btn-bg: var(--petrol);
+    --bs-btn-border-color: var(--petrol);
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: #0c303b;
+    --bs-btn-hover-border-color: #0c303b;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #0c303b;
+    --bs-btn-active-border-color: #0c303b;
+    --bs-btn-active-color: #fff;
+}
+.btn-garis {
+    --bs-btn-border-color: var(--tinta);
+    --bs-btn-color: var(--tinta);
+    --bs-btn-hover-bg: var(--tinta);
+    --bs-btn-hover-border-color: var(--tinta);
+    --bs-btn-hover-color: var(--beton);
+    --bs-btn-active-bg: var(--tinta);
+    --bs-btn-active-border-color: var(--tinta);
+    --bs-btn-active-color: var(--beton);
+}
+
+/* kode booking bergaya plat nomor */
+.plat {
+    display: inline-block;
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    white-space: nowrap;
+    padding: 0.3rem 0.55rem;
+    color: var(--tinta);
+    background: var(--kertas);
+    border: 2px solid var(--tinta);
+    border-radius: 4px;
+}
+
+/* beranda */
+.hero {
+    padding: 3rem 0 4rem;
+}
+.hero p {
+    font-size: 1.15rem;
+    max-width: 34rem;
+}
+.hero-foto {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 4px;
+    border-bottom: 8px solid var(--marka);
+}
+
+.bagian {
+    padding: 3.5rem 0;
+}
+.bagian-gelap {
+    background: var(--aspal);
+    color: #fff;
+}
+
+.motor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--kertas);
+    border: 1px solid var(--garis);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.motor img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+}
+.motor-isi {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1rem 1.1rem 1.2rem;
+}
+.motor-harga {
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.langkah {
+    list-style: none;
+    counter-reset: langkah;
+    padding: 0;
+    margin: 0;
+}
+.langkah li {
+    counter-increment: langkah;
+    border-top: 2px solid var(--marka);
+    padding-top: 1rem;
+}
+.langkah li::before {
+    content: counter(langkah);
+    display: block;
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--marka);
+    margin-bottom: 0.5rem;
+}
+.langkah p {
+    color: #c9cfcc;
+    margin: 0;
+}
+
+.kaki {
+    padding: 2rem 0;
+    font-size: 0.9rem;
+    color: var(--redup);
+    border-top: 1px solid var(--garis);
+}
+
+/* halaman booking */
+.panel {
+    background: var(--kertas);
+    border: 1px solid var(--garis);
+    border-radius: 4px;
+}
+
+.filter-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.filter-status a {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--garis);
+    border-radius: 4px;
+    background: var(--kertas);
+    color: var(--tinta);
+    font-weight: 500;
+    text-decoration: none;
+}
+.filter-status a:hover {
+    border-color: var(--tinta);
+}
+.filter-status a.aktif {
+    background: var(--tinta);
+    border-color: var(--tinta);
+    color: var(--beton);
+}
+.filter-status span {
+    margin-left: 0.3rem;
+    opacity: 0.65;
+}
+
+.tabel-booking {
+    --bs-table-bg: var(--kertas);
+    margin: 0;
+}
+.tabel-booking th {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--redup);
+    background: var(--kertas-2);
+    white-space: nowrap;
+}
+.tabel-booking td, .tabel-booking th {
+    padding: 0.8rem 0.9rem;
+    vertical-align: middle;
+}
+.tabel-booking small {
+    color: var(--redup);
+}
+
+.status {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.status-menunggu   { background: #fdefc4; color: #5c4300; }
+.status-disewa     { background: #d3e6ec; color: #0c303b; }
+.status-delay      { background: #f8d9c4; color: #7a3208; }
+.status-reschedule { background: #e3defa; color: #3b2c85; }
+.status-selesai    { background: #d5ecd9; color: #1c5a2b; }
+.status-batal      { background: #f3d6d2; color: #842519; }
+
+.form-label {
+    font-weight: 600;
+}
+.form-control, .form-select {
+    border-radius: 4px;
+    border-color: var(--garis-kuat);
+    background-color: var(--kertas);
+}
+fieldset legend {
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.kolom-cari {
+    min-width: 16rem;
+}
+
+/* tablet dan hp: foto beranda dibuat lebih pendek supaya armada cepat kelihatan */
+@media (max-width: 991.98px) {
+    .hero {
+        padding: 2rem 0 3rem;
+    }
+    .hero-foto {
+        aspect-ratio: 16 / 9;
+        max-height: 60vh;
+    }
+}
+
+/* di layar sempit tiap booking jadi satu kartu, bukan baris tabel */
+@media (max-width: 991.98px) {
+    .tabel-booking thead {
+        display: none;
+    }
+    .tabel-booking, .tabel-booking tbody, .tabel-booking tr, .tabel-booking td {
+        display: block;
+    }
+    .tabel-booking tr {
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid var(--garis);
+    }
+    .tabel-booking tr:last-child {
+        border-bottom: 0;
+    }
+    .tabel-booking td {
+        display: grid;
+        grid-template-columns: 6.5rem 1fr;
+        column-gap: 1rem;
+        padding: 0.3rem 0;
+        border: 0;
+    }
+    .tabel-booking td > * {
+        grid-column: 2;
+        justify-self: start;
+    }
+    .tabel-booking td[data-label]::before {
+        content: attr(data-label);
+        grid-row: 1 / span 2;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--redup);
+    }
+    .tabel-booking td.aksi {
+        display: flex;
+        gap: 0.4rem;
+        padding-top: 0.6rem;
+    }
+    .tabel-booking td.kosong {
+        display: block;
+        text-align: center;
+    }
+}
+
+/* ganti tema: halaman baru muncul lewat noda tinta yang melebar dari tombol */
+@keyframes tinta-menyebar {
+    from {
+        mask-size: 0 0;
+        mask-position: var(--tinta-x) var(--tinta-y);
+    }
+    to {
+        mask-size: var(--tinta-lebar) var(--tinta-lebar);
+        mask-position: calc(var(--tinta-x) - var(--tinta-lebar) / 2) calc(var(--tinta-y) - var(--tinta-lebar) / 2);
+    }
+}
+::view-transition-old(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+::view-transition-new(root) {
+    animation: tinta-menyebar 1.1s cubic-bezier(0.4, 0.2, 0.3, 1) both;
+    mix-blend-mode: normal;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Cpath d=%27M95.6 47.1Q97.6 50.0 97.5 53.1Q97.5 56.3 95.0 58.8Q92.5 61.4 90.9 63.8Q89.3 66.3 89.2 69.4Q89.2 72.6 87.9 75.4Q86.6 78.1 84.0 79.7Q81.3 81.3 79.0 83.1Q76.7 84.9 74.2 86.1Q71.6 87.4 68.2 86.7Q64.9 85.9 62.1 85.3Q59.3 84.6 57.2 86.6Q55.1 88.5 52.5 90.6Q50.0 92.7 47.2 92.6Q44.4 92.5 41.6 92.0Q38.9 91.6 35.9 91.5Q32.8 91.4 30.4 89.8Q28.0 88.2 26.2 85.8Q24.4 83.3 21.5 82.3Q18.6 81.4 15.0 80.5Q11.4 79.6 9.7 76.9Q8.1 74.2 8.3 70.7Q8.5 67.2 8.2 64.2Q8.0 61.3 8.2 58.4Q8.4 55.5 10.0 52.7Q11.6 50.0 11.9 47.5Q12.2 45.0 10.8 42.1Q9.4 39.1 9.6 36.2Q9.8 33.4 12.3 31.5Q14.7 29.6 16.5 27.7Q18.4 25.7 19.5 23.1Q20.5 20.5 22.5 18.6Q24.4 16.6 26.5 14.8Q28.6 12.9 30.3 9.7Q32.0 6.5 34.5 4.0Q37.0 1.6 40.4 2.4Q43.8 3.2 46.9 4.9Q50.0 6.7 52.8 6.9Q55.6 7.2 58.4 7.9Q61.1 8.5 63.4 10.2Q65.8 12.0 68.4 12.8Q71.0 13.7 73.9 14.4Q76.8 15.1 78.1 17.8Q79.5 20.5 79.5 23.9Q79.6 27.3 81.1 29.2Q82.6 31.2 85.3 32.7Q87.9 34.3 89.5 36.6Q91.1 39.0 92.4 41.6Q93.7 44.2 95.6 47.1Z%27/%3E%3Ccircle cx=%276%27 cy=%2730%27 r=%271.6%27/%3E%3Ccircle cx=%2793%27 cy=%2722%27 r=%271.2%27/%3E%3Ccircle cx=%2796%27 cy=%2770%27 r=%271.8%27/%3E%3Ccircle cx=%2712%27 cy=%2784%27 r=%271.3%27/%3E%3Ccircle cx=%2750%27 cy=%272.5%27 r=%271.1%27/%3E%3Ccircle cx=%2770%27 cy=%2797%27 r=%271.4%27/%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+}

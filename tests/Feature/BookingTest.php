@@ -11,10 +11,12 @@ class BookingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_root_redirects_to_bookings_index(): void
+    public function test_homepage_shows_fleet(): void
     {
         $response = $this->get('/');
-        $response->assertRedirect('/bookings');
+        $response->assertStatus(200);
+        $response->assertSee('Ducati Panigale V2');
+        $response->assertSee('Booking sekarang');
     }
 
     public function test_index_displays_bookings(): void
@@ -41,7 +43,7 @@ class BookingTest extends TestCase
     {
         $response = $this->get(route('bookings.create'));
         $response->assertStatus(200);
-        $response->assertSee('Tambah Reservasi Booking Baru');
+        $response->assertSee('Booking baru');
     }
 
     public function test_store_creates_booking_and_redirects(): void
@@ -49,6 +51,7 @@ class BookingTest extends TestCase
         $data = [
             'nama' => 'Ahmad Dani',
             'no_hp' => '081987654321',
+            'moge' => 'Ducati Panigale V2',
             'tanggal' => Carbon::now()->addDays(5)->toDateString(),
             'jam' => '14:30',
             'tanggal_selesai' => Carbon::now()->addDays(5)->toDateString(),
@@ -73,6 +76,7 @@ class BookingTest extends TestCase
         $data = [
             'nama' => 'Satriya Racing',
             'no_hp' => '0812341234',
+            'moge' => 'Ducati Panigale V2',
             'tanggal' => Carbon::now()->toDateString(),
             'jam' => Carbon::now()->subHour()->format('H:i'),
             'tanggal_selesai' => Carbon::now()->toDateString(),
@@ -94,6 +98,7 @@ class BookingTest extends TestCase
         $data = [
             'nama' => 'Gerry Salim',
             'no_hp' => '0812341234',
+            'moge' => 'Ducati Panigale V2',
             'tanggal' => Carbon::now()->subDays(2)->toDateString(),
             'jam' => '10:00',
             'tanggal_selesai' => Carbon::now()->subDays(1)->toDateString(),
@@ -183,6 +188,7 @@ class BookingTest extends TestCase
         $updateData = [
             'nama' => 'Citra Kirana Updated',
             'no_hp' => '08551234567',
+            'moge' => 'Ducati Panigale V2',
             'tanggal' => Carbon::now()->addDays(3)->toDateString(),
             'jam' => '11:00',
             'tanggal_selesai' => Carbon::now()->addDays(3)->toDateString(),
@@ -242,6 +248,7 @@ class BookingTest extends TestCase
         $updateDelay = [
             'nama' => 'Rider Delay',
             'no_hp' => '08123444555',
+            'moge' => 'Ducati Panigale V2',
             'tanggal' => Carbon::now()->subDays(1)->toDateString(),
             'jam' => '10:00',
             'tanggal_selesai' => Carbon::now()->toDateString(),
@@ -263,5 +270,76 @@ class BookingTest extends TestCase
 
         $response = $this->get(route('bookings.index'));
         $response->assertSee('Reschedule');
+    }
+
+    public function test_store_rejects_overlapping_schedule_for_same_bike(): void
+    {
+        $data = [
+            'nama' => 'Penyewa Pertama',
+            'no_hp' => '081200000001',
+            'moge' => 'Yamaha YZF-R1M',
+            'tanggal' => Carbon::now()->addDays(7)->toDateString(),
+            'jam' => '09:00',
+            'tanggal_selesai' => Carbon::now()->addDays(8)->toDateString(),
+            'jam_selesai' => '09:00',
+        ];
+        $this->post(route('bookings.store'), $data)->assertSessionHasNoErrors();
+
+        $bentrok = array_merge($data, [
+            'nama' => 'Penyewa Kedua',
+            'tanggal' => Carbon::now()->addDays(7)->toDateString(),
+            'jam' => '15:00',
+            'tanggal_selesai' => Carbon::now()->addDays(9)->toDateString(),
+        ]);
+        $this->post(route('bookings.store'), $bentrok)->assertSessionHasErrors('moge');
+        $this->assertDatabaseMissing('bookings', ['nama' => 'Penyewa Kedua']);
+
+        // motor lain di jam yang sama tetap boleh
+        $this->post(route('bookings.store'), array_merge($bentrok, ['moge' => 'Honda CBR1000RR-R']))
+            ->assertSessionHasNoErrors();
+
+        // mulai tepat saat motor dikembalikan juga boleh
+        $sesudah = array_merge($bentrok, [
+            'nama' => 'Penyewa Ketiga',
+            'tanggal' => Carbon::now()->addDays(8)->toDateString(),
+            'jam' => '09:00',
+        ]);
+        $this->post(route('bookings.store'), $sesudah)->assertSessionHasNoErrors();
+    }
+
+    public function test_store_rejects_return_time_before_start(): void
+    {
+        $response = $this->post(route('bookings.store'), [
+            'nama' => 'Salah Jam',
+            'no_hp' => '081200000002',
+            'moge' => 'Kawasaki Ninja ZX-6R',
+            'tanggal' => Carbon::now()->addDays(3)->toDateString(),
+            'jam' => '14:00',
+            'tanggal_selesai' => Carbon::now()->addDays(3)->toDateString(),
+            'jam_selesai' => '10:00',
+        ]);
+
+        $response->assertSessionHasErrors('jam_selesai');
+    }
+
+    public function test_index_can_search_and_filter_by_status(): void
+    {
+        $dasar = [
+            'no_hp' => '081200000003',
+            'tanggal' => Carbon::now()->addDays(2)->toDateString(),
+            'jam' => '10:00:00',
+            'tanggal_selesai' => Carbon::now()->addDays(2)->toDateString(),
+            'jam_selesai' => '18:00:00',
+        ];
+        Booking::create($dasar + ['nama' => 'Rina Wijaya', 'status' => 'menunggu']);
+        Booking::create($dasar + ['nama' => 'Joko Susilo', 'status' => 'batal']);
+
+        $this->get(route('bookings.index', ['q' => 'Rina']))
+            ->assertSee('Rina Wijaya')
+            ->assertDontSee('Joko Susilo');
+
+        $this->get(route('bookings.index', ['status' => 'batal']))
+            ->assertSee('Joko Susilo')
+            ->assertDontSee('Rina Wijaya');
     }
 }
