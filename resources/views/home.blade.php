@@ -1,71 +1,100 @@
 @extends('layouts.app')
 
+@section('kepala', 'kepala-transparan')
+
+@php
+    $armada = collect(config('moge'));
+    $foto = ['Sport' => 'zx6r.jpg', 'Cruiser' => 'iron883.jpg', 'Superbike' => 'r1m.jpg'];
+@endphp
+
 @section('content')
-<header class="hero">
-    <div class="container">
-        <div class="row align-items-center g-4 g-lg-5">
-            <div class="col-lg-6">
-                <h1 class="mb-3">Moge siap jalan, tinggal pilih tanggal.</h1>
-                <p class="mb-4">
-                    Sewa motor gede di Surabaya untuk touring akhir pekan, sunmori,
-                    atau sekadar mencoba dulu sebelum membeli. Ada {{ count(config('moge')) }} unit
-                    yang bisa dipesan lewat halaman ini.
-                </p>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('bookings.create') }}" class="btn btn-marka btn-lg px-4">Booking sekarang</a>
-                    <a href="#armada" class="btn btn-garis btn-lg px-4">Lihat armada</a>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <img src="{{ asset('images/iron883.jpg') }}" alt="Harley-Davidson Iron 883 warna hitam doff terparkir di pinggir jalan" class="hero-foto" width="900" height="563">
-            </div>
+<section class="hero">
+    <img src="{{ asset('images/hero.jpg') }}" alt="Ducati Panigale V2 merah terparkir di landasan" class="hero-foto" width="1920" height="1444" fetchpriority="high">
+    <div class="hero-isi">
+        <h1>Moge siap jalan.</h1>
+        <p>Sewa motor gede di Surabaya untuk touring akhir pekan, sunmori, atau mencoba dulu sebelum membeli.</p>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('bookings.create') }}" class="btn btn-putih">Booking sekarang</a>
+            <a href="#armada" class="btn btn-kaca">Lihat armada</a>
         </div>
     </div>
-</header>
+</section>
 
-<section class="bagian pt-0" id="armada">
-    <div class="container">
-        <h2 class="mb-1">Armada</h2>
-        <p class="mb-4">Harga sewa per hari.</p>
-
+<section class="bagian">
+    <div class="sempit">
         <div class="row g-4">
-            @foreach(config('moge') as $motor)
-                <div class="col-sm-6 col-lg-4">
-                    <article class="motor">
-                        <img src="{{ asset('images/' . $motor['gambar']) }}" alt="{{ $motor['nama'] }}" loading="lazy" width="900" height="600">
-                        <div class="motor-isi">
-                            <h3 class="mb-1">{{ $motor['nama'] }}</h3>
-                            <p class="text-secondary mb-3">{{ $motor['tipe'] }}, {{ $motor['cc'] }} cc</p>
-                            <div class="d-flex justify-content-between align-items-end mt-auto">
-                                <div>
-                                    <div class="motor-harga">Rp {{ number_format($motor['harga'], 0, ',', '.') }}</div>
-                                    <small class="text-secondary">per hari</small>
-                                </div>
-                                <a href="{{ route('bookings.create', ['moge' => $motor['nama']]) }}" class="btn btn-petrol">Sewa motor ini</a>
+            @foreach($armada->groupBy('tipe') as $tipe => $motor)
+                <div class="col-md-4">
+                    <a href="#armada" class="kartu-foto">
+                        <img src="{{ asset('images/' . ($foto[$tipe] ?? $motor->first()['gambar'])) }}" alt="" loading="lazy" width="900" height="600">
+                        <div class="kartu-bawah">
+                            <div>
+                                <h3>{{ $tipe }}</h3>
+                                <p>{{ $motor->count() }} unit</p>
                             </div>
+                            <span class="panah" aria-hidden="true"><i class="bi bi-arrow-right"></i></span>
                         </div>
-                    </article>
+                    </a>
                 </div>
             @endforeach
         </div>
     </div>
 </section>
 
-<section class="bagian bagian-gelap">
-    <div class="container">
-        <h2 class="mb-4">Cara sewa</h2>
-        <ol class="langkah row g-4">
-            <li class="col-md-4">
+<section class="bagian bagian-gelap" id="armada">
+    <div class="lebar">
+        <h2 class="mb-2">Armada</h2>
+        <p class="redup mb-5">Harga sewa per hari. Pilih motornya, lalu isi jadwal di form booking.</p>
+
+        <div class="row g-4">
+            @foreach($armada as $motor)
+                <div class="{{ $loop->first ? 'col-12' : 'col-md-6' }}">
+                    <a href="{{ route('bookings.create', ['moge' => $motor['nama']]) }}" class="kartu-foto kartu-motor">
+                        <img src="{{ asset('images/' . $motor['gambar']) }}" alt="{{ $motor['nama'] }}" loading="lazy" width="900" height="600">
+                        <div class="pil-baris">
+                            <span class="pil">{{ $motor['tipe'] }}</span>
+                            <span class="pil">{{ $motor['cc'] }} cc</span>
+                        </div>
+                        <div class="kartu-bawah">
+                            <div>
+                                <h3>{{ $motor['nama'] }}</h3>
+                                <p>Rp {{ number_format($motor['harga'], 0, ',', '.') }} per hari</p>
+                            </div>
+                            <span class="panah" aria-hidden="true"><i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<section class="bagian">
+    <div class="bagian-belah">
+        <div>
+            <h2>Cari jadwal yang masih kosong.</h2>
+            <p>Isi jadwal ambil dan jadwal kembali. Kalau motornya sudah dipesan orang lain di jam itu, form langsung memberi tahu sampai kapan motor itu dipakai.</p>
+            <a href="{{ route('bookings.create') }}" class="btn btn-utama">Booking sekarang</a>
+        </div>
+        <img src="{{ asset('images/cbr1000rr.jpg') }}" alt="Honda CBR1000RR-R merah putih biru" loading="lazy" width="900" height="675">
+    </div>
+</section>
+
+<section class="bagian pt-0">
+    <div class="sempit">
+        <h2 class="text-center mb-5">Cara sewa</h2>
+        <ol class="langkah">
+            <li>
                 <h3>Pilih motor dan tanggal</h3>
-                <p>Isi form booking dengan jadwal ambil dan jadwal kembali. Kalau motornya sudah dipesan orang lain di jam itu, form akan langsung memberi tahu.</p>
+                <p>Isi form booking dengan jadwal ambil dan jadwal kembali.</p>
             </li>
-            <li class="col-md-4">
+            <li>
                 <h3>Tunggu konfirmasi</h3>
                 <p>Admin menghubungi nomor WhatsApp yang kamu isi untuk memastikan jadwal dan pembayaran.</p>
             </li>
-            <li class="col-md-4">
+            <li>
                 <h3>Ambil motornya</h3>
-                <p>Datang sesuai jadwal dengan membawa KTP dan SIM yang masih berlaku. Motor dikembalikan sesuai jam yang tertulis di booking.</p>
+                <p>Datang sesuai jadwal dengan membawa KTP dan SIM yang masih berlaku.</p>
             </li>
         </ol>
     </div>
@@ -73,8 +102,8 @@
 @endsection
 
 @section('kaki')
-    <span>
+    <p class="mb-0">
         Foto dari Wikimedia Commons: Sound Media (CC0), Alek Kirstein (CC BY-SA 2.0),
         Terragio67, Dennis Bratland, Chanokchon (CC BY-SA 4.0).
-    </span>
+    </p>
 @endsection
