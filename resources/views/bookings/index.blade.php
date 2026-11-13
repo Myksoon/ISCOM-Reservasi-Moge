@@ -1,99 +1,113 @@
 @extends('layouts.app')
 
+@section('title', 'Daftar booking - Sewa Moge Surabaya')
+
 @section('content')
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-    <div>
-        <h2 class="fw-bold mb-1">Daftar Reservasi Sewa Moge</h2>
-        <p class="text-muted mb-0">Kelola jadwal booking rental moge wilayah Surabaya & sekitarnya</p>
+<main class="container py-4 py-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Daftar booking</h2>
+            <p class="text-secondary mb-0">Status berubah sendiri saat jadwal sewa mulai dan selesai.</p>
+        </div>
+        <a href="{{ route('bookings.create') }}" class="btn btn-petrol">Tambah booking</a>
     </div>
-    <a href="{{ route('bookings.create') }}" class="btn btn-primary px-3 shadow-sm">
-        <i class="bi bi-plus-circle me-1"></i> Tambah Booking
-    </a>
-</div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+        </div>
+    @endif
+
+    <div class="d-flex flex-wrap justify-content-between gap-3 mb-3">
+        <nav class="filter-status" aria-label="Filter status">
+            <a href="{{ route('bookings.index', ['q' => request('q')]) }}" class="{{ request('status') ? '' : 'aktif' }}">
+                Semua <span>{{ $jumlah->sum() }}</span>
+            </a>
+            @foreach(\App\Models\Booking::STATUS as $kunci => $label)
+                <a href="{{ route('bookings.index', ['status' => $kunci, 'q' => request('q')]) }}" class="{{ request('status') === $kunci ? 'aktif' : '' }}">
+                    {{ $label }} <span>{{ $jumlah[$kunci] ?? 0 }}</span>
+                </a>
+            @endforeach
+        </nav>
+
+        <form action="{{ route('bookings.index') }}" method="GET" class="d-flex gap-2" role="search">
+            @if(request('status'))
+                <input type="hidden" name="status" value="{{ request('status') }}">
+            @endif
+            <input type="search" name="q" value="{{ request('q') }}" class="form-control kolom-cari" placeholder="Cari nama, no. HP, atau motor" aria-label="Cari booking">
+            <button type="submit" class="btn btn-garis">Cari</button>
+        </form>
     </div>
-@endif
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body p-0">
+    <div class="panel">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-dark">
+            <table class="table tabel-booking">
+                <thead>
                     <tr>
-                        <th class="text-center" style="width: 50px;">No</th>
-                        <th>Nama Pemesan</th>
-                        <th>No. HP / WA</th>
-                        <th>Mulai Sewa</th>
-                        <th>Selesai / Kembali</th>
-                        <th>Catatan / Unit Moge</th>
+                        <th>Kode</th>
+                        <th>Pemesan</th>
+                        <th>Motor</th>
+                        <th>Mulai sewa</th>
+                        <th>Kembali</th>
                         <th>Status</th>
-                        <th class="text-center" style="width: 140px;">Aksi</th>
+                        <th class="text-end">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($bookings as $booking)
                         <tr>
-                            <td class="text-center fw-medium">{{ $loop->iteration }}</td>
-                            <td class="fw-bold text-dark">{{ $booking->nama }}</td>
-                            <td>
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $booking->no_hp) }}" target="_blank" class="text-decoration-none text-success">
-                                    <i class="bi bi-whatsapp me-1"></i>{{ $booking->no_hp }}
+                            <td data-label="Kode"><span class="plat">{{ $booking->kode }}</span></td>
+                            <td data-label="Pemesan">
+                                <div class="fw-semibold">{{ $booking->nama }}</div>
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $booking->no_hp) }}" target="_blank" rel="noopener" class="small text-decoration-none">
+                                    <i class="bi bi-whatsapp" aria-hidden="true"></i> {{ $booking->no_hp }}
                                 </a>
                             </td>
-                            <td>
-                                <div>{{ \Carbon\Carbon::parse($booking->tanggal)->format('d/m/Y') }}</div>
-                                <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ \Carbon\Carbon::parse($booking->jam)->format('H:i') }} WIB</small>
-                            </td>
-                            <td>
-                                @if($booking->tanggal_selesai && $booking->jam_selesai)
-                                    <div>{{ \Carbon\Carbon::parse($booking->tanggal_selesai)->format('d/m/Y') }}</div>
-                                    <small class="text-muted"><i class="bi bi-clock-history me-1"></i>{{ \Carbon\Carbon::parse($booking->jam_selesai)->format('H:i') }} WIB</small>
-                                @else
-                                    <span class="text-muted">-</span>
+                            <td data-label="Motor">
+                                <div>{{ $booking->moge ?? '-' }}</div>
+                                @if($booking->catatan)
+                                    <small>{{ Str::limit($booking->catatan, 60) }}</small>
                                 @endif
                             </td>
-                            <td>{{ $booking->catatan ?? '-' }}</td>
-                            <td>
-                                @if($booking->status === 'menunggu')
-                                    <span class="badge bg-warning text-dark px-2 py-1"><i class="bi bi-hourglass-split me-1"></i>Menunggu</span>
-                                @elseif($booking->status === 'disewa')
-                                    <span class="badge bg-primary px-2 py-1"><i class="bi bi-bicycle me-1"></i>Disewa</span>
-                                @elseif($booking->status === 'delay')
-                                    <span class="badge text-white px-2 py-1" style="background-color: #fd7e14;"><i class="bi bi-exclamation-triangle me-1"></i>Delay</span>
-                                @elseif($booking->status === 'reschedule')
-                                    <span class="badge bg-info text-dark px-2 py-1"><i class="bi bi-arrow-repeat me-1"></i>Reschedule</span>
-                                @elseif($booking->status === 'selesai')
-                                    <span class="badge bg-success px-2 py-1"><i class="bi bi-check-circle me-1"></i>Selesai</span>
-                                @elseif($booking->status === 'batal')
-                                    <span class="badge bg-danger px-2 py-1"><i class="bi bi-x-circle me-1"></i>Batal</span>
+                            <td data-label="Mulai sewa">
+                                <div>{{ $booking->mulai()->format('d/m/Y') }}</div>
+                                <small>{{ $booking->mulai()->format('H:i') }} WIB</small>
+                            </td>
+                            <td data-label="Kembali">
+                                @if($booking->selesai())
+                                    <div>{{ $booking->selesai()->format('d/m/Y') }}</div>
+                                    <small>{{ $booking->selesai()->format('H:i') }} WIB</small>
                                 @else
-                                    <span class="badge bg-secondary px-2 py-1">{{ $booking->status }}</span>
+                                    -
                                 @endif
                             </td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('bookings.edit', $booking) }}" class="btn btn-sm btn-outline-warning" title="Edit Booking">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-                                    <form action="{{ route('bookings.destroy', $booking) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Yakin hapus data?')" title="Hapus Booking">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
+                            <td data-label="Status">
+                                <span class="status status-{{ $booking->status }}">{{ \App\Models\Booking::STATUS[$booking->status] ?? $booking->status }}</span>
+                            </td>
+                            <td class="text-end text-nowrap aksi">
+                                <a href="{{ route('bookings.edit', $booking) }}" class="btn btn-sm btn-garis" aria-label="Edit booking {{ $booking->kode }}">
+                                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                                </a>
+                                <form action="{{ route('bookings.destroy', $booking) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus booking {{ $booking->kode }}?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Hapus booking {{ $booking->kode }}">
+                                        <i class="bi bi-trash" aria-hidden="true"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5 text-muted">
-                                <i class="bi bi-calendar-x fs-1 d-block mb-2 text-secondary"></i>
-                                Belum ada data reservasi moge saat ini.
+                            <td colspan="7" class="text-center py-5 kosong">
+                                @if(request('q') || request('status'))
+                                    Tidak ada booking yang cocok.
+                                    <a href="{{ route('bookings.index') }}">Tampilkan semua</a>
+                                @else
+                                    Belum ada booking.
+                                    <a href="{{ route('bookings.create') }}">Buat booking pertama</a>
+                                @endif
                             </td>
                         </tr>
                     @endforelse
@@ -101,5 +115,9 @@
             </table>
         </div>
     </div>
-</div>
+
+    <div class="mt-3">
+        {{ $bookings->links() }}
+    </div>
+</main>
 @endsection
